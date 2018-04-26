@@ -6,14 +6,27 @@
     <groupId>test</groupId>
     <artifactId>usb</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <modules>
+        <module>ftdi</module>
+        <module>dtr</module>
+    </modules>
+    <packaging>pom</packaging>
 
     <name>test usb</name>
+
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.version>1.2.40</kotlin.version>
         <junit.version>4.12</junit.version>
+
+        <outputDirectory>${project.root}/target</outputDirectory>
     </properties>
 
     <dependencies>
@@ -39,13 +52,39 @@
             <artifactId>usb4java-javax</artifactId>
             <version>1.2.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.kotlin-graphics</groupId>
+            <artifactId>kotlin-unsigned</artifactId>
+            <version>v3.1.1</version>
+        </dependency>
     </dependencies>
 
     <build>
-        <sourceDirectory>src/main/kotlin</sourceDirectory>
-        <testSourceDirectory>src/test/kotlin</testSourceDirectory>
+        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
+        <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
 
         <plugins>
+            <plugin>
+                <groupId>org.commonjava.maven.plugins</groupId>
+                <artifactId>directory-maven-plugin</artifactId>
+                <version>0.1</version>
+                <executions>
+                    <execution>
+                        <id>directories</id>
+                        <goals>
+                            <goal>directory-of</goal>
+                        </goals>
+                        <phase>validate</phase>
+                        <configuration>
+                            <property>project.root</property>
+                            <project>
+                                <groupId>test</groupId>
+                                <artifactId>usb</artifactId>
+                            </project>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
@@ -66,6 +105,40 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.0.2</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${outputDirectory}/libs</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.0.2</version>
+                <configuration>
+                    <finalName>${project.groupId}.${project.artifactId}-${project.version}</finalName>
+                    <outputDirectory>${outputDirectory}/libs</outputDirectory>
+                    <archive>
+                        <addMavenDescriptor>false</addMavenDescriptor>
+                        <compress>true</compress>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>libs/</classpathPrefix>
+                        </manifest>
+                    </archive>
+                </configuration>
             </plugin>
         </plugins>
     </build>

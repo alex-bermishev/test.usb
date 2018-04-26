@@ -1,4 +1,4 @@
-package test
+package parsec
 
 import org.junit.Test
 import kotlin.test.assertEquals
